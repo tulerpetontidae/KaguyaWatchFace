@@ -9,6 +9,7 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
     var specialNumberFont = null;
     var hourFont = null;
     var minuteFont = null;
+    var textFont = null;
     var backgroundImage = null;
 
 
@@ -22,6 +23,7 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         specialNumberFont = WatchUi.loadResource(Rez.Fonts.SpecialNumbersFont);
         hourFont = WatchUi.loadResource(Rez.Fonts.HourFont);
         minuteFont = WatchUi.loadResource(Rez.Fonts.MinuteFont);
+        textFont = WatchUi.loadResource(Rez.Fonts.TextFont);
 
         backgroundImage = WatchUi.loadResource(Rez.Drawables.BackgroundImage);
     }
@@ -47,18 +49,34 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         var screenHeight = dc.getHeight();
         
         var yPosition = screenWidth / (416.0/115.0);
-        var xPositionHour = screenHeight / (416.0/114.0);
+        var xPositionHour = screenHeight / (416.0/(114.0-10.0));
         
-        var xPositionMinute = screenHeight / (416.0/135.0);
+        var xPositionMinute = screenHeight / (416.0/(135.0-10.0));
+
+        var yPositionDay = screenWidth / (416.0/(183.0+15.0));
+        var xPositionDay = screenHeight / (416.0/(125.0-10.0));
 
         var clockTime = Sys.getClockTime();
+        var currentTime = Toybox.Time.Gregorian.info(Toybox.Time.now(), Toybox.Time.FORMAT_MEDIUM);  // Converting to Gregorian date-time information
+        var day = currentTime.day;
+        var month = currentTime.month;
+        var year = currentTime.year % 100;  // Get last two digits of year
+
         var hourString = Lang.format("$1$", [clockTime.hour.format("%02d")]);
         var minuteString = Lang.format("$1$", [clockTime.min.format("%02d")]);
+        var dateString = Lang.format("$1$ $2$ $3$", [
+            day.format("%02d"), 
+            Lang.format("$1$", [month]).substring(0, 3), 
+            year.format("%02d")
+        ]);
+
+
         
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawText(xPositionHour, yPosition, hourFont, hourString, Gfx.TEXT_JUSTIFY_RIGHT);
 
         dc.drawText(xPositionMinute, yPosition, minuteFont, minuteString, Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(xPositionDay, yPositionDay, textFont, dateString, Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     function updateBattery(dc) {
@@ -75,26 +93,26 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
     function updateHeartRate(dc) {
         var screenWidth = dc.getWidth();
         var screenHeight = dc.getHeight();
-        var xPosition = screenWidth / (416.0/74.0);
-        var yPosition = screenHeight / (416.0/255.0);
+        var xPosition = screenWidth / (416.0/79.0);
+        var yPosition = screenHeight / (416.0/250.0);
         var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, false);
         var mostRecentHeartRate = heartrateIterator.next().heartRate;
 
         if (mostRecentHeartRate != null) {
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d"), Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d") + "bpm", Gfx.TEXT_JUSTIFY_CENTER);
         }
     }
 
     function updateFootsteps(dc) {
         var screenWidth = dc.getWidth();
         var screenHeight = dc.getHeight();
-        var xPosition = screenWidth / (416.0/94.0);
-        var yPosition = screenHeight / (416.0/295.0);
+        var xPosition = screenWidth / (416.0/99.0);
+        var yPosition = screenHeight / (416.0/296.0);
         var footsteps = ActivityMonitor.getInfo().steps;
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(xPosition, yPosition, specialNumberFont, footsteps.format("%d"), Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(xPosition, yPosition, specialNumberFont, footsteps.format("%d") + "k", Gfx.TEXT_JUSTIFY_CENTER);
     }
 
 
