@@ -86,12 +86,38 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         var screenHeight = dc.getHeight();
         var xPosition = screenWidth / (416.0/209.0);
         var yPosition = screenHeight / (416.0/12.0);
+
+        var xPosition_battery = xPosition - 45 * screenWidth / 416.0;
+        var yPosition_battery = yPosition - 3 * screenWidth / 416.0;
+
         var batteryLevel = Sys.getSystemStats().battery;
 
+        // Determine dimensions for battery icon
+        var batteryWidth = 25;
+        var batteryHeight = 43;
+        
+        // Draw filled rectangle to represent the full battery icon
+        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+        dc.fillRectangle(xPosition_battery + 1, yPosition_battery + 1, batteryWidth-1, batteryHeight-1);
+        
+        // Calculate the filled part based on battery level
+        var fillWidth = (batteryLevel / 100.0) * batteryWidth;
+        
+        // Draw filled rectangle to represent the current battery level
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_WHITE);
+        dc.fillRectangle(xPosition_battery + 1, yPosition_battery + 1, fillWidth-1, batteryHeight-1);
+        
+        // Create and draw the clipping mask for battery icon
+        dc.setColor(Gfx.COLOR_TRANSPARENT, Gfx.COLOR_BLACK);
+        // dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(xPosition_battery, yPosition_battery, iconFont, "h", Gfx.TEXT_JUSTIFY_LEFT);
+
+        // Draw the battery percentage next to the icon
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(xPosition - 40 * screenWidth / 416.0, yPosition - 3.0, iconFont, "h", Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(xPosition_battery, yPosition_battery, iconFont, "k", Gfx.TEXT_JUSTIFY_LEFT);
         dc.drawText(xPosition, yPosition, specialNumberFont, batteryLevel.format("%d") + "%", Gfx.TEXT_JUSTIFY_LEFT);
     }
+
 
     function updateHeartRate(dc) {
         var screenWidth = dc.getWidth();
@@ -103,8 +129,8 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
 
         if (mostRecentHeartRate != null) {
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(xPosition - 40 * screenWidth / 416.0, yPosition + 2.0, iconFont, "p", Gfx.TEXT_JUSTIFY_LEFT);
-            dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d") + "bpm", Gfx.TEXT_JUSTIFY_LEFT);
+            dc.drawText(xPosition - 45 * screenWidth / 416.0, yPosition - 5.0, iconFont, "p", Gfx.TEXT_JUSTIFY_LEFT);
+            dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d"), Gfx.TEXT_JUSTIFY_LEFT);
         }
     }
 
@@ -117,7 +143,7 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         var footstepsInThousands = (footsteps / 1000.0).format("%.1f");
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(xPosition - 40 * screenWidth / 416.0, yPosition, iconFont, "s", Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(xPosition - 35 * screenWidth / 416.0, yPosition, iconFont, "s", Gfx.TEXT_JUSTIFY_LEFT);
         dc.drawText(xPosition, yPosition, specialNumberFont, footstepsInThousands + "k", Gfx.TEXT_JUSTIFY_LEFT);
     }
 
