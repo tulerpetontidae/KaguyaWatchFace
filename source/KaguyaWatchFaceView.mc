@@ -10,6 +10,7 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
     var hourFont = null;
     var minuteFont = null;
     var textFont = null;
+    var iconFont = null;
     var backgroundImage = null;
 
 
@@ -24,6 +25,7 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         hourFont = WatchUi.loadResource(Rez.Fonts.HourFont);
         minuteFont = WatchUi.loadResource(Rez.Fonts.MinuteFont);
         textFont = WatchUi.loadResource(Rez.Fonts.TextFont);
+        iconFont = WatchUi.loadResource(Rez.Fonts.IconFont);
 
         backgroundImage = WatchUi.loadResource(Rez.Drawables.BackgroundImage);
     }
@@ -82,37 +84,41 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
     function updateBattery(dc) {
         var screenWidth = dc.getWidth();
         var screenHeight = dc.getHeight();
-        var xPosition = screenWidth / (416.0/156.0);
-        var yPosition = screenHeight / (416.0/56.0);
+        var xPosition = screenWidth / (416.0/209.0);
+        var yPosition = screenHeight / (416.0/12.0);
         var batteryLevel = Sys.getSystemStats().battery;
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(xPosition, yPosition, specialNumberFont, batteryLevel.format("%d") + "%", Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(xPosition - 40 * screenWidth / 416.0, yPosition - 3.0, iconFont, "h", Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(xPosition, yPosition, specialNumberFont, batteryLevel.format("%d") + "%", Gfx.TEXT_JUSTIFY_LEFT);
     }
 
     function updateHeartRate(dc) {
         var screenWidth = dc.getWidth();
         var screenHeight = dc.getHeight();
-        var xPosition = screenWidth / (416.0/79.0);
+        var xPosition = screenWidth / (416.0/(79.0 - 15.0));
         var yPosition = screenHeight / (416.0/250.0);
         var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, false);
         var mostRecentHeartRate = heartrateIterator.next().heartRate;
 
         if (mostRecentHeartRate != null) {
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-            dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d") + "bpm", Gfx.TEXT_JUSTIFY_CENTER);
+            dc.drawText(xPosition - 40 * screenWidth / 416.0, yPosition + 2.0, iconFont, "p", Gfx.TEXT_JUSTIFY_LEFT);
+            dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d") + "bpm", Gfx.TEXT_JUSTIFY_LEFT);
         }
     }
 
     function updateFootsteps(dc) {
         var screenWidth = dc.getWidth();
         var screenHeight = dc.getHeight();
-        var xPosition = screenWidth / (416.0/99.0);
+        var xPosition = screenWidth / (416.0/(99.0 - 15.0));
         var yPosition = screenHeight / (416.0/296.0);
         var footsteps = ActivityMonitor.getInfo().steps;
+        var footstepsInThousands = (footsteps / 1000.0).format("%.1f");
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(xPosition, yPosition, specialNumberFont, footsteps.format("%d") + "k", Gfx.TEXT_JUSTIFY_CENTER);
+        dc.drawText(xPosition - 40 * screenWidth / 416.0, yPosition, iconFont, "s", Gfx.TEXT_JUSTIFY_LEFT);
+        dc.drawText(xPosition, yPosition, specialNumberFont, footstepsInThousands + "k", Gfx.TEXT_JUSTIFY_LEFT);
     }
 
 
