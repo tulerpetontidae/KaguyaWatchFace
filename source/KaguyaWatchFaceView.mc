@@ -7,6 +7,8 @@ using Toybox.ActivityMonitor as ActivityMonitor;
 class KaguyaWatchFaceView extends WatchUi.WatchFace {
 
     var specialNumberFont = null;
+    var hourFont = null;
+    var minuteFont = null;
     var backgroundImage = null;
 
 
@@ -16,77 +18,85 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
 
     function onLayout(dc) {
         setLayout(Rez.Layouts.WatchFace(dc));
-        specialNumberFont = WatchUi.loadResource(Rez.Fonts.SpecialNumbersFont);
-        backgroundImage = WatchUi.loadResource(Rez.Drawables.BackgroundImage);
-        
 
+        specialNumberFont = WatchUi.loadResource(Rez.Fonts.SpecialNumbersFont);
+        hourFont = WatchUi.loadResource(Rez.Fonts.HourFont);
+        minuteFont = WatchUi.loadResource(Rez.Fonts.MinuteFont);
+
+        backgroundImage = WatchUi.loadResource(Rez.Drawables.BackgroundImage);
     }
 
     function onShow() as Void {
     }
 
     function onUpdate(dc) {
-        View.onUpdate(dc);
         if (backgroundImage != null) {
-                dc.drawBitmap(0, 0, backgroundImage);
-            } else {
-                Sys.println("Background image is null.");
-            }
+            dc.drawBitmap(0, 0, backgroundImage);
+        } else {
+            Sys.println("Background image is null.");
+        }
+
         updateClock(dc);
         updateBattery(dc);
         updateHeartRate(dc);
+        updateFootsteps(dc);
     }
 
     function updateClock(dc) {
         var screenWidth = dc.getWidth();
-        var screenHeight = dc.getHeight();  // Use getHeight for accuracy
-        var xPosition = screenWidth / 16;
-        var yPosition = screenHeight / 2.4;       
+        var screenHeight = dc.getHeight();
+        
+        var yPosition = screenWidth / (416.0/115.0);
+        var xPositionHour = screenHeight / (416.0/114.0);
+        
+        var xPositionMinute = screenHeight / (416.0/135.0);
 
         var clockTime = Sys.getClockTime();
-        var timeString = Lang.format("$1$", [clockTime.hour.format("%02d")]);  // 24-hour format, two digits
+        var hourString = Lang.format("$1$", [clockTime.hour.format("%02d")]);
+        var minuteString = Lang.format("$1$", [clockTime.min.format("%02d")]);
         
-        var view = View.findDrawableById("TimeLabel") as Toybox.WatchUi.Text;  // Find the drawable by ID
-        view.setLocation(xPosition, yPosition);  // Corrected line
-        view.setColor(Gfx.COLOR_WHITE);  // Set colour to white
-        view.setFont(specialNumberFont);  // Set the font
-        view.setText(timeString);  // Update the text
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(xPositionHour, yPosition, hourFont, hourString, Gfx.TEXT_JUSTIFY_RIGHT);
+
+        dc.drawText(xPositionMinute, yPosition, minuteFont, minuteString, Gfx.TEXT_JUSTIFY_LEFT);
     }
 
-
-
     function updateBattery(dc) {
-
         var screenWidth = dc.getWidth();
-        var screenHeight = dc.getHeight();  // Use getHeight for accuracy
-        var xPosition = screenWidth / (416.0/146.0);
-        var yPosition = screenHeight / (416.0/76.0);         
+        var screenHeight = dc.getHeight();
+        var xPosition = screenWidth / (416.0/156.0);
+        var yPosition = screenHeight / (416.0/56.0);
+        var batteryLevel = Sys.getSystemStats().battery;
 
-        var systemStats = Sys.getSystemStats();
-        var batteryLevel = systemStats.battery;
-        var batteryView = View.findDrawableById("BatteryLabel") as Toybox.WatchUi.Text;
-        batteryView.setFont(specialNumberFont);  // Make sure the font ID matches what you've defined in fonts.xml
-        batteryView.setColor(Gfx.COLOR_WHITE);  // Set colour to white
-        batteryView.setLocation(xPosition, yPosition);  // Corrected line
-        batteryView.setText(batteryLevel.format("%d") + "%");
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(xPosition, yPosition, specialNumberFont, batteryLevel.format("%d") + "%", Gfx.TEXT_JUSTIFY_CENTER);
     }
 
     function updateHeartRate(dc) {
         var screenWidth = dc.getWidth();
-        var screenHeight = dc.getHeight();  // Use getHeight for accuracy
-        var xPosition = screenWidth / (416.0/77.0);
-        var yPosition = screenHeight / (416.0/273.0); 
-
+        var screenHeight = dc.getHeight();
+        var xPosition = screenWidth / (416.0/74.0);
+        var yPosition = screenHeight / (416.0/255.0);
         var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, false);
         var mostRecentHeartRate = heartrateIterator.next().heartRate;
+
         if (mostRecentHeartRate != null) {
-            var hrView = View.findDrawableById("HeartRateLabel") as Toybox.WatchUi.Text;
-            hrView.setFont(specialNumberFont);  // Make sure the font ID matches what you've defined in fonts.xml
-            hrView.setColor(Gfx.COLOR_WHITE);  // Set colour to white
-            hrView.setLocation(xPosition, yPosition);  // Corrected line
-            hrView.setText(mostRecentHeartRate.format("%d"));
+            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d"), Gfx.TEXT_JUSTIFY_CENTER);
         }
     }
+
+    function updateFootsteps(dc) {
+        var screenWidth = dc.getWidth();
+        var screenHeight = dc.getHeight();
+        var xPosition = screenWidth / (416.0/94.0);
+        var yPosition = screenHeight / (416.0/295.0);
+        var footsteps = ActivityMonitor.getInfo().steps;
+
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(xPosition, yPosition, specialNumberFont, footsteps.format("%d"), Gfx.TEXT_JUSTIFY_CENTER);
+    }
+
 
     function onHide() as Void {
     }
