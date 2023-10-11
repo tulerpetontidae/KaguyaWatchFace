@@ -12,6 +12,7 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
     var textFont = null;
     var iconFont = null;
     var backgroundImage = null;
+    var batteryWidth = null;
 
 
     function initialize() {
@@ -28,6 +29,8 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         iconFont = WatchUi.loadResource(Rez.Fonts.IconFont);
 
         backgroundImage = WatchUi.loadResource(Rez.Drawables.BackgroundImage);
+
+        batteryWidth = WatchUi.loadResource(Rez.Strings.BatteryWidth).toFloat();
     }
 
     function onShow() as Void {
@@ -93,8 +96,8 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         var batteryLevel = Sys.getSystemStats().battery;
 
         // Determine dimensions for battery icon
-        var batteryWidth = 25;
-        var batteryHeight = 43;
+        // var batteryWidth = 25 * screenWidth / 416.0;
+        var batteryHeight = 43 * screenWidth / 416.0;
         
         // Draw filled rectangle to represent the full battery icon
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);

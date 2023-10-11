@@ -1,0 +1,7 @@
+<fonts>
+    <font id="IconFont" filename="icons-32px.fnt" antialias="true" />
+    <font id="SpecialNumbersFont" filename="BigJohnPRO_20pt.fnt" antialias="true" filter="0123456789%kbpm ." />
+    <font id="MinuteFont" filename="BigJohnPRO_reg_51pt.fnt" antialias="true" filter="0123456789" />
+    <font id="HourFont" filename="BigJohnPRO_bold_51pt.fnt" antialias="true" filter="0123456789" />
+    <font id="TextFont" filename="BigJohnPRO_letter_18pt.fnt" antialias="true" />
+</fonts>
