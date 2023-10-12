@@ -132,18 +132,21 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         var mostRecentHeartRate = Activity.getActivityInfo().currentHeartRate;
 
         // Use ActivityMonitor.getHeartRateHistory as a fallback
-        if (mostRecentHeartRate == null && ActivityMonitor has :getHeartRateHistory) {
-            var hrHistory = ActivityMonitor.getHeartRateHistory(new Time.Duration(60), true).next();
-            if (hrHistory != null) {
-                mostRecentHeartRate = hrHistory.heartRate;
-            }
-        }
+        // if (mostRecentHeartRate == null && ActivityMonitor has :getHeartRateHistory) {
+        //     var hrHistory = ActivityMonitor.getHeartRateHistory(new Time.Duration(60), true).next();
+        //     if (hrHistory != null) {
+        //         mostRecentHeartRate = hrHistory.heartRate;
+        //     }
+        // }
 
         // Draw the heart rate on the screen
         if (mostRecentHeartRate != null) {
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
             dc.drawText(xPosition - 45 * screenWidth / 416.0, yPosition - 5.0, iconFont, "p", Gfx.TEXT_JUSTIFY_LEFT);
             dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d"), Gfx.TEXT_JUSTIFY_LEFT);
+        } else {
+            dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+            dc.drawText(xPosition - 45 * screenWidth / 416.0, yPosition - 5.0, iconFont, "P", Gfx.TEXT_JUSTIFY_LEFT);
         }
     }
 
