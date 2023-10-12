@@ -127,15 +127,26 @@ class KaguyaWatchFaceView extends WatchUi.WatchFace {
         var screenHeight = dc.getHeight();
         var xPosition = screenWidth / (416.0/(79.0 - 15.0));
         var yPosition = screenHeight / (416.0/250.0);
-        var heartrateIterator = ActivityMonitor.getHeartRateHistory(null, false);
-        var mostRecentHeartRate = heartrateIterator.next().heartRate;
 
+        // Use Activity.getActivityInfo().currentHeartRate as primary source
+        var mostRecentHeartRate = Activity.getActivityInfo().currentHeartRate;
+
+        // Use ActivityMonitor.getHeartRateHistory as a fallback
+        if (mostRecentHeartRate == null && ActivityMonitor has :getHeartRateHistory) {
+            var hrHistory = ActivityMonitor.getHeartRateHistory(new Time.Duration(60), true).next();
+            if (hrHistory != null) {
+                mostRecentHeartRate = hrHistory.heartRate;
+            }
+        }
+
+        // Draw the heart rate on the screen
         if (mostRecentHeartRate != null) {
             dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
             dc.drawText(xPosition - 45 * screenWidth / 416.0, yPosition - 5.0, iconFont, "p", Gfx.TEXT_JUSTIFY_LEFT);
             dc.drawText(xPosition, yPosition, specialNumberFont, mostRecentHeartRate.format("%d"), Gfx.TEXT_JUSTIFY_LEFT);
         }
     }
+
 
     function updateFootsteps(dc) {
         var screenWidth = dc.getWidth();
